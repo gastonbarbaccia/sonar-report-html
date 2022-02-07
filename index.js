@@ -141,9 +141,13 @@ function logError(context, error){
   
   //get SonarQube version
   try {
-    const res = await got(`${sonarBaseURL}/api/system/status`, {
+    const res = await got.get(`${sonarBaseURL}/api/system/status`, {
       agent,
-      headers
+      headers,
+      https: {
+        certificateAuthority: [],
+        rejectUnauthorized: false,
+      },
     });
     const json = JSON.parse(res.body);
     version = json.version;
@@ -217,7 +221,11 @@ function logError(context, error){
     // Form authentication with username/password
     try {
       const response = await got.post(`${sonarBaseURL}/api/authentication/login`, {
-          agent,
+        agent,
+        https: {
+          certificateAuthority: [],
+          rejectUnauthorized: false,
+        },
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
           },
@@ -235,9 +243,13 @@ function logError(context, error){
   }
 
   if (data.sinceLeakPeriod) {
-    const res = await got(`${sonarBaseURL}/api/settings/values?keys=sonar.leak.period`, {
+    const res = await got.get(`${sonarBaseURL}/api/settings/values?keys=sonar.leak.period`, {
       agent,
-      headers
+      headers,
+      https: {
+        certificateAuthority: [],
+        rejectUnauthorized: false,
+      }
     });
     const json = JSON.parse(res.getBody());
     data.previousPeriod = json.settings[0].value;
@@ -250,9 +262,13 @@ function logError(context, error){
 
   do {
       try {
-          const response = await got(`${sonarBaseURL}/api/rules/search?activation=true&ps=${pageSize}&p=${page}${filterRule}${withOrganization}`, {
-              agent,
-              headers
+          const response = await got.get(`${sonarBaseURL}/api/rules/search?activation=true&ps=${pageSize}&p=${page}${filterRule}${withOrganization}`, {
+            agent,
+            headers,
+            https: {
+              certificateAuthority: [],
+              rejectUnauthorized: false,
+            },
           });
           page++;
           const json = JSON.parse(response.body);
@@ -286,9 +302,13 @@ function logError(context, error){
      */
     do {
       try {
-          const response = await got(`${sonarBaseURL}/api/issues/search?componentKeys=${sonarComponent}&ps=${pageSize}&p=${page}&statuses=${ISSUE_STATUSES}&resolutions=&s=STATUS&asc=no${leakPeriodFilter}${filterIssue}${withOrganization}`, {
-              agent,
-              headers
+          const response = await got.get(`${sonarBaseURL}/api/issues/search?componentKeys=${sonarComponent}&ps=${pageSize}&p=${page}&statuses=${ISSUE_STATUSES}&resolutions=&s=STATUS&asc=no${leakPeriodFilter}${filterIssue}${withOrganization}`, {
+            agent,
+            headers,
+            https: {
+              certificateAuthority: [],
+              rejectUnauthorized: false,
+            },
           });
           page++;
           const json = JSON.parse(response.body);
@@ -322,9 +342,13 @@ function logError(context, error){
       page = 1;
       do {
         try {
-            const response = await got(`${sonarBaseURL}/api/hotspots/search?projectKey=${sonarComponent}${filterHotspots}${withOrganization}&ps=${pageSize}&p=${page}&statuses=${HOTSPOT_STATUSES}`, {
-                agent,
-                headers
+            const response = await got.get(`${sonarBaseURL}/api/hotspots/search?projectKey=${sonarComponent}${filterHotspots}${withOrganization}&ps=${pageSize}&p=${page}&statuses=${HOTSPOT_STATUSES}`, {
+              agent,
+              headers,
+              https: {
+                certificateAuthority: [],
+                rejectUnauthorized: false,
+              },
             });
             page++;
             const json = JSON.parse(response.body);
@@ -339,9 +363,13 @@ function logError(context, error){
       // 2) Getting hotspots details with hotspots/show
       for (let hotspotKey of data.hotspotKeys){
         try {
-            const response = await got(`${sonarBaseURL}/api/hotspots/show?hotspot=${hotspotKey}`, {
-                agent,
-                headers
+            const response = await got.get(`${sonarBaseURL}/api/hotspots/show?hotspot=${hotspotKey}`, {
+              agent,
+              headers,
+              https: {
+                certificateAuthority: [],
+                rejectUnauthorized: false,
+              },
             });
             const hotspot = JSON.parse(response.body);
             hSeverity = hotspotSeverities[hotspot.rule.vulnerabilityProbability];
